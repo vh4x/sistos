@@ -1,0 +1,28 @@
+#include "ICalendarizador"
+
+using namespace std;
+
+class CalendarizadorFCFS : ICalendarizador
+{
+private:
+  
+
+public:
+  Sistema(int tipo) {
+    switch (tipo) {
+    case 1:
+      despachador = new 
+      break;
+    case 2:
+      break;
+    case 3:
+      break;
+    case 4:
+      break;
+    }
+  }
+  
+
+  
+
+};

@@ -1,6 +1,8 @@
 %{
 #include <cstdio>
 #include <iostream>
+#include "Proceso.cpp"
+
 using namespace std;
 
 // Definiciones de flex que Bison necesita
@@ -8,6 +10,13 @@ extern "C" int yylex();
 extern "C" int yyparse();
 extern "C" FILE *yyin;
  
+  int pid;
+  int prioridad;
+  int ciclo;
+  std::list<int> first;
+
+  int algoritmo = 0;
+
 void yyerror(const char *s);
 %}
 
@@ -37,19 +46,23 @@ pcb:
 id
 prioridad
 ciclo
-bursts
+{ first.clear();}
+bursts  { Proceso p (pid, prioridad, ciclo, first);
+   std::cout << p.getPid();
+   std::cout  << p.getBursts().front();
+}
 ;
 
 id:
-PID INT      { cout << "pid int: " << $2 << endl; }
+ PID INT      { pid = $2;}
 ;
 
 prioridad:
-PRIORIDAD ':' INT  { cout << "prioridad int: " << $3 << endl; }
+PRIORIDAD ':' INT  { prioridad = $3; }
 ;
 
 ciclo:
-CICLO ':' INT  { cout << "ciclo int: " << $3 << endl; }
+CICLO ':' INT  { ciclo = $3; }
 ;
 
 bursts:
@@ -63,16 +76,33 @@ linea_cpu linea_io;
 ;
 
 linea_cpu:
-CPU ':' INT   { cout << "cpu int: " << $3 << endl; }
+ CPU ':' INT   { first.push_back($3); }
 ;
 
 linea_io:
-IO ':' INT   { cout << "io int: " << $3 << endl; }
+IO ':' INT   { first.push_back($3); }
 ;
 
 %%
 
+void menu() {
+    algoritmo = 0;
+    cout << "\n";
+    cout << "Algoritmo:\n";
+    cout << "1. FCFS\n";
+    cout << "2. Shortest job first\n";
+    cout << "3. Prioridad\n";
+    cout << "4. Round-robin \n";
+    cout << "5. Exit \n";
+    cout << "Response : ";
+    cin >> algoritmo;
+    cout << "\n";
+}
+
+
 main() {
+
+  
 	// open a file handle to a particular file:
 	FILE *myfile = fopen("entrada.txt", "r");
 	// make sure it is valid:

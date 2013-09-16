@@ -1,0 +1,17 @@
+#include "ICalendarizador"
+#include "Proceso"
+
+using namespace std;
+
+class ColaFCFS : public ICalendarizador {
+private:
+  std::queue<Proceso> cola;
+  
+public: 
+  CalendarizadorFCFS() {
+    cola 
+  }
+  Proceso Siguiente() {
+    return null;
+  }
+};

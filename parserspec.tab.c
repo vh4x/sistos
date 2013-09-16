@@ -70,6 +70,8 @@
 
 #include <cstdio>
 #include <iostream>
+#include "Proceso.cpp"
+
 using namespace std;
 
 // Definiciones de flex que Bison necesita
@@ -77,11 +79,18 @@ extern "C" int yylex();
 extern "C" int yyparse();
 extern "C" FILE *yyin;
  
+  int pid;
+  int prioridad;
+  int ciclo;
+  std::list<int> first;
+
+  int algoritmo = 0;
+
 void yyerror(const char *s);
 
 
 /* Line 268 of yacc.c  */
-#line 85 "parserspec.tab.c"
+#line 94 "parserspec.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -124,14 +133,14 @@ typedef union YYSTYPE
 {
 
 /* Line 293 of yacc.c  */
-#line 15 "parserspec.y"
+#line 24 "parserspec.y"
 
 	int ival;
 
 
 
 /* Line 293 of yacc.c  */
-#line 135 "parserspec.tab.c"
+#line 144 "parserspec.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -143,7 +152,7 @@ typedef union YYSTYPE
 
 
 /* Line 343 of yacc.c  */
-#line 147 "parserspec.tab.c"
+#line 156 "parserspec.tab.c"
 
 #ifdef short
 # undef short
@@ -362,16 +371,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  6
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   17
+#define YYLAST   19
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  10
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  10
+#define YYNNTS  11
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  13
+#define YYNRULES  14
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  27
+#define YYNSTATES  28
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
@@ -417,25 +426,25 @@ static const yytype_uint8 yytranslate[] =
    YYRHS.  */
 static const yytype_uint8 yyprhs[] =
 {
-       0,     0,     3,     6,     8,    13,    16,    20,    24,    27,
-      29,    32,    34,    38
+       0,     0,     3,     6,     8,     9,    15,    18,    22,    26,
+      29,    31,    34,    36,    40
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      11,     0,    -1,    11,    12,    -1,    12,    -1,    13,    14,
-      15,    16,    -1,     3,     8,    -1,     4,     9,     8,    -1,
-       5,     9,     8,    -1,    16,    17,    -1,    17,    -1,    18,
-      19,    -1,    18,    -1,     6,     9,     8,    -1,     7,     9,
-       8,    -1
+      11,     0,    -1,    11,    12,    -1,    12,    -1,    -1,    14,
+      15,    16,    13,    17,    -1,     3,     8,    -1,     4,     9,
+       8,    -1,     5,     9,     8,    -1,    17,    18,    -1,    18,
+      -1,    19,    20,    -1,    19,    -1,     6,     9,     8,    -1,
+       7,     9,     8,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    32,    32,    33,    37,    44,    48,    52,    56,    57,
-      61,    62,    66,    70
+       0,    41,    41,    42,    49,    46,    57,    61,    65,    69,
+      70,    74,    75,    79,    83
 };
 #endif
 
@@ -445,8 +454,8 @@ static const yytype_uint8 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "PID", "PRIORIDAD", "CICLO", "CPU", "IO",
-  "INT", "':'", "$accept", "archivo", "pcb", "id", "prioridad", "ciclo",
-  "bursts", "lineas", "linea_cpu", "linea_io", 0
+  "INT", "':'", "$accept", "archivo", "pcb", "$@1", "id", "prioridad",
+  "ciclo", "bursts", "lineas", "linea_cpu", "linea_io", 0
 };
 #endif
 
@@ -462,15 +471,15 @@ static const yytype_uint16 yytoknum[] =
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    10,    11,    11,    12,    13,    14,    15,    16,    16,
-      17,    17,    18,    19
+       0,    10,    11,    11,    13,    12,    14,    15,    16,    17,
+      17,    18,    18,    19,    20
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     2,     1,     4,     2,     3,     3,     2,     1,
-       2,     1,     3,     3
+       0,     2,     2,     1,     0,     5,     2,     3,     3,     2,
+       1,     2,     1,     3,     3
 };
 
 /* YYDEFACT[STATE-NAME] -- Default reduction number in state STATE-NUM.
@@ -478,31 +487,33 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     0,     0,     3,     0,     5,     1,     2,     0,     0,
-       0,     0,     0,     6,     0,     0,     4,     9,    11,     7,
-       0,     8,     0,    10,    12,     0,    13
+       0,     0,     0,     3,     0,     6,     1,     2,     0,     0,
+       0,     0,     4,     7,     0,     0,     8,     0,     5,    10,
+      12,     0,     9,     0,    11,    13,     0,    14
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,     3,     4,     9,    12,    16,    17,    18,    23
+      -1,     2,     3,    15,     4,     9,    12,    18,    19,    20,
+      24
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -8
+#define YYPACT_NINF -10
 static const yytype_int8 yypact[] =
 {
-      -2,    -6,     0,    -8,     1,    -8,    -8,    -8,    -5,     2,
-       3,    -3,     4,    -8,     5,    -1,     4,    -8,     7,    -8,
-       8,    -8,     6,    -8,    -8,     9,    -8
+      -2,    -6,     0,   -10,     1,   -10,   -10,   -10,    -5,     2,
+       3,    -3,   -10,   -10,     4,     7,   -10,    -1,     7,   -10,
+       8,     6,   -10,     9,   -10,   -10,    11,   -10
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -8,    -8,    10,    -8,    -8,    -8,    -8,    -7,    -8,    -8
+     -10,   -10,    14,   -10,   -10,   -10,   -10,   -10,    -9,   -10,
+     -10
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -511,29 +522,29 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-       6,     1,     5,     1,    10,     8,    14,    11,    20,    21,
-      15,    13,     7,    19,    22,    25,    24,    26
+       6,     1,     5,     1,    10,     8,    14,    11,    21,    22,
+       0,    13,    16,    17,    25,    23,     7,     0,    26,    27
 };
 
 #define yypact_value_is_default(yystate) \
-  ((yystate) == (-8))
+  ((yystate) == (-10))
 
 #define yytable_value_is_error(yytable_value) \
   YYID (0)
 
-static const yytype_uint8 yycheck[] =
+static const yytype_int8 yycheck[] =
 {
-       0,     3,     8,     3,     9,     4,     9,     5,     9,    16,
-       6,     8,     2,     8,     7,     9,     8,     8
+       0,     3,     8,     3,     9,     4,     9,     5,     9,    18,
+      -1,     8,     8,     6,     8,     7,     2,    -1,     9,     8
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,    11,    12,    13,     8,     0,    12,     4,    14,
-       9,     5,    15,     8,     9,     6,    16,    17,    18,     8,
-       9,    17,     7,    19,     8,     9,     8
+       0,     3,    11,    12,    14,     8,     0,    12,     4,    15,
+       9,     5,    16,     8,     9,    13,     8,     6,    17,    18,
+      19,     9,    18,     7,    20,     8,     9,     8
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1367,45 +1378,62 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 5:
+        case 4:
 
 /* Line 1806 of yacc.c  */
-#line 44 "parserspec.y"
-    { cout << "pid int: " << (yyvsp[(2) - (2)].ival) << endl; }
+#line 49 "parserspec.y"
+    { first.clear();}
+    break;
+
+  case 5:
+
+/* Line 1806 of yacc.c  */
+#line 50 "parserspec.y"
+    { Proceso p (pid, prioridad, ciclo, first);
+   std::cout << p.getPid();
+   std::cout  << p.getBursts().front();
+}
     break;
 
   case 6:
 
 /* Line 1806 of yacc.c  */
-#line 48 "parserspec.y"
-    { cout << "prioridad int: " << (yyvsp[(3) - (3)].ival) << endl; }
+#line 57 "parserspec.y"
+    { pid = (yyvsp[(2) - (2)].ival);}
     break;
 
   case 7:
 
 /* Line 1806 of yacc.c  */
-#line 52 "parserspec.y"
-    { cout << "ciclo int: " << (yyvsp[(3) - (3)].ival) << endl; }
+#line 61 "parserspec.y"
+    { prioridad = (yyvsp[(3) - (3)].ival); }
     break;
 
-  case 12:
+  case 8:
 
 /* Line 1806 of yacc.c  */
-#line 66 "parserspec.y"
-    { cout << "cpu int: " << (yyvsp[(3) - (3)].ival) << endl; }
+#line 65 "parserspec.y"
+    { ciclo = (yyvsp[(3) - (3)].ival); }
     break;
 
   case 13:
 
 /* Line 1806 of yacc.c  */
-#line 70 "parserspec.y"
-    { cout << "io int: " << (yyvsp[(3) - (3)].ival) << endl; }
+#line 79 "parserspec.y"
+    { first.push_back((yyvsp[(3) - (3)].ival)); }
+    break;
+
+  case 14:
+
+/* Line 1806 of yacc.c  */
+#line 83 "parserspec.y"
+    { first.push_back((yyvsp[(3) - (3)].ival)); }
     break;
 
 
 
 /* Line 1806 of yacc.c  */
-#line 1409 "parserspec.tab.c"
+#line 1437 "parserspec.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1636,10 +1664,27 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 73 "parserspec.y"
+#line 86 "parserspec.y"
+
+
+void menu() {
+    algoritmo = 0;
+    cout << "\n";
+    cout << "Algoritmo:\n";
+    cout << "1. FCFS\n";
+    cout << "2. Shortest job first\n";
+    cout << "3. Prioridad\n";
+    cout << "4. Round-robin \n";
+    cout << "5. Exit \n";
+    cout << "Response : ";
+    cin >> algoritmo;
+    cout << "\n";
+}
 
 
 main() {
+
+  
 	// open a file handle to a particular file:
 	FILE *myfile = fopen("entrada.txt", "r");
 	// make sure it is valid:

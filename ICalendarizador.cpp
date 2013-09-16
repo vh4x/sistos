@@ -1,6 +1,9 @@
+#pragma once
+#include "Proceso.cpp"
+
 class ICalendarizador
 {
-    public:
-        virtual ~ICalendarizador() {}
-        virtual Proceso Siguiente() = 0;
+public:
+  virtual Proceso* Siguiente() = 0;
+  virtual void Agregar(Proceso* proceso) = 0;
 };

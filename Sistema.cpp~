@@ -1,0 +1,35 @@
+#include "Despachador"
+
+using namespace std;
+
+class Sistema
+{
+private:
+  // Ciclos totales de CPU
+  int cpu_total;
+
+  int cpu_parcial;
+
+  ICalendarizador despachador;
+
+  Proceso actual;
+
+public:
+  Sistema(int tipo) {
+    switch (tipo) {
+    case 1:
+      despachador = new 
+      break;
+    case 2:
+      break;
+    case 3:
+      break;
+    case 4:
+      break;
+    }
+  }
+  
+
+  
+
+};
