@@ -9,8 +9,8 @@ using namespace std;
 
 class CompararPrioridad {
     public:
-    bool operator()(Proceso& p1, Proceso& p2) {
-       if (p1->getPrioridad < p2->getPrioridad) return true;
+    bool operator()(Proceso *p1, Proceso *p2) {
+      if (p1->getPrioridad() < p2->getPrioridad()) return true;
        return false;
     }
 };
@@ -20,7 +20,7 @@ private:
   std::priority_queue<Proceso*, vector<Proceso*>, CompararPrioridad> cola;
   
 public: 
-  ColaFCFS() { 
+  ColaPrioridad() { 
   }
 
   virtual Proceso* Siguiente() {
@@ -35,5 +35,9 @@ public:
 
   virtual void Agregar(Proceso* proceso) {
     cola.push(proceso);
+  }
+
+  virtual bool Vacio() {
+    return cola.empty();
   }
 };

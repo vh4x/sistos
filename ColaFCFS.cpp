@@ -27,4 +27,8 @@ public:
   virtual void Agregar(Proceso* proceso) {
     cola.push(proceso);
   }
+  
+  virtual bool  Vacio() {
+    return cola.empty();
+  }
 };
