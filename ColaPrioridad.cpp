@@ -1,14 +1,23 @@
 #pragma once
 #include <iostream>
+#include <queue>
 #include "ICalendarizador.cpp"
 #include "Proceso.cpp"
 
 
 using namespace std;
 
-class ColaFCFS : public ICalendarizador {
+class CompararPrioridad {
+    public:
+    bool operator()(Proceso& p1, Proceso& p2) {
+       if (p1->getPrioridad < p2->getPrioridad) return true;
+       return false;
+    }
+};
+
+class ColaPrioridad : public ICalendarizador {
 private:
-  std::queue<Proceso*> cola;
+  std::priority_queue<Proceso*, vector<Proceso*>, CompararPrioridad> cola;
   
 public: 
   ColaFCFS() { 
@@ -16,7 +25,7 @@ public:
 
   virtual Proceso* Siguiente() {
     if(!cola.empty()) {
-      Proceso* retorno = cola.front();     
+      Proceso* retorno = cola.top();     
       cola.pop();
       return retorno;
     } else {
