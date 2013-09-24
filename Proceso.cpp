@@ -2,7 +2,6 @@
 #include <list>
 
 using namespace std;
-
 class Proceso
 {
 private:
@@ -11,16 +10,16 @@ private:
   int ciclo;
   int ciclo_actual;
   int indice_actual;
-  std::list<int> bursts;
+  std::vector<int> bursts;
 
 public:
-  Proceso(int id, int pr, int ci, std::list<int> bu) {
+  Proceso(int id, int pr, int ci, std::vector<int> bu) {
     pid = id;
     prioridad = pr;
     ciclo = ci;
     bursts = bu;
-    ciclo_actual = 0;
-    indice_actual = 0;
+    ciclo_actual = 1;
+    indice_actual = -1;
   }
 
   void incCiclo() {
@@ -29,14 +28,15 @@ public:
 
   void incIndice() {
     indice_actual++;
+    if ((indice_actual % bursts.size()) == (bursts.size()-1)) ciclo_actual++;
   }
 
-  int getCiclo_actual(){
+  int getCicloActual(){
     return ciclo_actual;
   }
 
-  int getIndice_actual() {
-    return indice_actual % 3;
+  int getIndiceActual() {
+    return indice_actual % bursts.size();
   }
 
   int getPid() {
@@ -51,12 +51,24 @@ public:
     return ciclo;
   }
 
-  std::list<int> getBursts() {
+  int getTipoBurst() {
+    if (getIndiceActual() % 2 == 0)
+      return 1;
+    else return 0;
+  }
+
+  bool ciclosTerminados() {
+    return ciclo_actual > ciclo;
+  }
+
+  std::vector<int> getBursts() {
     return bursts;
   }
 
-  int getBurst(int indice) {
-    return 1;
+  int getBurst() {
+    incIndice();
+    int b = bursts[getIndiceActual()];
+    return b;
   }
 
 };

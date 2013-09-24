@@ -28,7 +28,7 @@ public:
     cola.push(proceso);
   }
   
-  virtual bool  Vacio() {
+  virtual bool Vacio() {
     return cola.empty();
   }
 };

@@ -13,7 +13,7 @@ extern "C" FILE *yyin;
   int pid;
   int prioridad;
   int ciclo;
-  std::list<int> first;
+  std::vector<int> first;
 
   int algoritmo = 0;
 
