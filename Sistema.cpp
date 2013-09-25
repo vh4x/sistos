@@ -6,6 +6,7 @@
 #include <chrono>
 #include <thread>
 #include <unistd.h>
+#include <limits>
 #include "ColaFCFS.cpp"
 #include "ColaPrioridad.cpp"
 #include "ICalendarizador.cpp"
@@ -33,12 +34,15 @@ private:
   ICalendarizador *cola_waiting;
 
   ICalendarizador *cola_terminated;
+  
+  int count;
 
 
 public:
 
   Sistema(int algoritmo) {
     cpu_total = 0;
+    count = 0;
     std::vector<int> v;
     null = new Proceso(-1, -1, -1, v);
     switch (algoritmo) {
@@ -72,7 +76,10 @@ public:
     io_actual = null;
     cpu_siguiente = cpu_actual->getBurst();
     io_siguiente = cpu_siguiente;
-    while ( (!cola_ready->Vacio() || !cola_waiting->Vacio()) || (!cpu_actual->ciclosTerminados() || !io_actual->ciclosTerminados())) {
+
+    while (count < 10 &&  !(cpu_actual==null && io_actual==null)  ) {
+      count++;
+      printState();
       ProcesarSiguiente();
     }
   }
@@ -83,6 +90,9 @@ public:
     Proceso *sig_io;
    
     if (cpu_siguiente == minimo && io_siguiente == minimo){
+      cout<<"iguales";
+      cout<<"\n\n";
+      if (cpu_actual == null && io_actual == null) return;
       // Cambiar proceso en ejecución
       sig_io = cpu_actual;
       
@@ -102,7 +112,7 @@ public:
 	cpu_actual = cola_ready->Siguiente();
 	cpu_siguiente = cpu_actual->getBurst();
       } else {
-	cpu_siguiente = 9999;
+	cpu_actual = null;
       }
 
       if (!cola_waiting->Vacio()) {
@@ -110,52 +120,62 @@ public:
 	io_siguiente = io_actual->getBurst();
       } 
       else {
-	io_siguiente = 9999;
+	io_actual = null;
       }
-      
-
+     
       actualizarTotal(minimo);
-      cout<<(cpu_total);
       return;
     }
     
     if (cpu_siguiente == minimo) {
       cout<<("mincpu");
+      cout<<"\n\n";
       if (!cpu_actual->ciclosTerminados()) {
-	if (!cola_waiting->Vacio()) {
+	if (!cola_waiting->Vacio() || io_actual != null) {
 	  cola_waiting->Agregar(cpu_actual);	
+	  io_siguiente = io_siguiente-cpu_siguiente;
 	} else {
 	  io_actual = cpu_actual;
+	  io_siguiente = io_actual->getBurst();
 	}
       }
-      if (!cola_ready->Vacio())
+      if (!cola_ready->Vacio()) {
 	cpu_actual = cola_ready->Siguiente();
+      } else {
+	cpu_actual = null;
+      }
+
       // Se calcula la diferencia que queda para que IO termine
-      io_siguiente = io_siguiente-cpu_siguiente;
+   
 
       cpu_siguiente = cpu_actual->getBurst();
 
       actualizarTotal(minimo);           
-      cout<<(cpu_total);
       return;
     }
 
     if (io_siguiente == minimo) {
       cout<<("minio");
+      cout<<"\n\n";
       if (!io_actual->ciclosTerminados()) {
-	if (!cola_ready->Vacio()) {
+	if (!cola_ready->Vacio() || cpu_actual != null) {
 	  cola_ready->Agregar(io_actual);
+	  cpu_siguiente = cpu_siguiente-io_siguiente;
 	} else {
 	  cpu_actual = io_actual;
+	  cpu_siguiente = cpu_actual->getBurst();
 	}
       }
-      if (!cola_waiting->Vacio())
+
+      if (!cola_waiting->Vacio()){
 	io_actual = cola_waiting->Siguiente();      
+      } else {
+	io_actual = null;
+      }
+
       // Se calcula la diferencia que queda para que CPU termine
-      cpu_siguiente = cpu_siguiente-io_siguiente;
       io_siguiente = io_actual->getBurst();
       actualizarTotal(minimo);
-      cout<<(cpu_total);
       return;
     }
 
@@ -166,15 +186,36 @@ public:
     return;
   }
 
+  void printState() {
+    cout<<"CPU total"<<cpu_total<<"\n";
+    if (!cola_ready->Vacio())cout<<"cola_ready"<<cola_ready->front()<<"\n";
+    if (!cola_waiting->Vacio())cout<<"cola_waiting"<<cola_waiting->front()<<"\n";
+    if (cpu_actual != null) {
+    cout<<"CPU actual"<<": ";
+    cout<<"Pid: "<<cpu_actual->getPid() <<" ,";
+    cout<<"indice: "<<cpu_actual->getIndiceActual() <<" ,";
+    cout<<"ciclo: "<<cpu_actual->getCicloActual()<<"\n";
+    }
+    
+    if (io_actual != null) {
+    cout<<"IO actual"<<": ";
+    cout<<"Pid: "<<io_actual->getPid() <<" ,";
+    cout<<"indice: "<<io_actual->getIndiceActual() <<" ,";
+    cout<<"ciclo: "<<io_actual->getCicloActual()<<"\n";
+    }
+
+
+  }
+
 };
 
 int main() {
     std::vector<int> first;
     first.push_back(10);
     first.push_back(200);
-    Proceso p1 = Proceso(1, 1, 2, first);
+    Proceso p1 = Proceso(1, 1, 1, first);
 
-    Proceso p2 = Proceso(2, 1, 3, first);
+    Proceso p2 = Proceso(2, 1, 1, first);
 
     Proceso* ref = &p1;
     Proceso* ref2 = &p2;
@@ -188,6 +229,5 @@ int main() {
     // Prioridad
     Sistema prioridad = Sistema(2);
     (prioridad.ready())->Agregar(ref2);
-    (prioridad.ready())->Agregar(ref);
-    
+    (prioridad.ready())->Agregar(ref);    
 }

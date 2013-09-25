@@ -1,5 +1,6 @@
 #pragma once
 #include <list>
+#include <limits>
 
 using namespace std;
 class Proceso
@@ -14,11 +15,15 @@ private:
 
 public:
   Proceso(int id, int pr, int ci, std::vector<int> bu) {
+    if (pid = -1) {
+      ciclo = 0;
+      prioridad = 0;
+    }
     pid = id;
     prioridad = pr;
     ciclo = ci;
     bursts = bu;
-    ciclo_actual = 1;
+    ciclo_actual = -1;
     indice_actual = -1;
   }
 
@@ -28,7 +33,7 @@ public:
 
   void incIndice() {
     indice_actual++;
-    if ((indice_actual % bursts.size()) == (bursts.size()-1)) ciclo_actual++;
+    if ((indice_actual % bursts.size()) == 0) ciclo_actual++;
   }
 
   int getCicloActual(){
@@ -58,7 +63,8 @@ public:
   }
 
   bool ciclosTerminados() {
-    return ciclo_actual > ciclo;
+    if (pid == -1) return true;
+    return ciclo_actual >= ciclo;
   }
 
   std::vector<int> getBursts() {
@@ -66,6 +72,7 @@ public:
   }
 
   int getBurst() {
+    if (pid == -1) return std::numeric_limits<int>::max();
     incIndice();
     int b = bursts[getIndiceActual()];
     return b;

@@ -31,4 +31,8 @@ public:
   virtual bool Vacio() {
     return cola.empty();
   }
+  
+  virtual Proceso* front() {
+    return cola.front();
+  }
 };
