@@ -9,6 +9,7 @@
 #include <limits>
 #include "ColaFCFS.cpp"
 #include "ColaPrioridad.cpp"
+#include "ColaSJF.cpp"
 #include "ICalendarizador.cpp"
 
 using namespace std;
@@ -56,7 +57,14 @@ public:
       cola_ready = new ColaPrioridad();
       cola_waiting = new ColaPrioridad();
       break;
+
+    case 3:
+      cola_ready = new ColaSJF();
+      cola_waiting = new ColaSJF();
+      break;
+
     }
+    
   }
  
   ICalendarizador *ready() {
@@ -101,7 +109,11 @@ public:
 
       // Actualizar estado
       if (sig_io != null && !sig_io->ciclosTerminados()) {
-	cola_waiting->Agregar(sig_io);		
+	if (sig_io->getSize() != 1) {
+	  cola_waiting->Agregar(sig_io);		
+	} else {
+	  
+	}
       }
 
       if (sig_cpu != null && !sig_cpu->ciclosTerminados()) {
@@ -132,11 +144,20 @@ public:
       cout<<"\n\n";
       if (!cpu_actual->ciclosTerminados()) {
 	if (!cola_waiting->Vacio() || io_actual != null) {
-	  cola_waiting->Agregar(cpu_actual);	
-	  io_siguiente = io_siguiente-cpu_siguiente;
+	  if (cpu_actual->getSize()!= 1) {
+	    cola_waiting->Agregar(cpu_actual);	
+	    io_siguiente = io_siguiente-cpu_siguiente;
+	  } else {
+	    //todo
+	    asignarCpuACpu(cpu_actual);
+	  }
 	} else {
-	  io_actual = cpu_actual;
-	  io_siguiente = io_actual->getBurst();
+	  if (cpu_actual->getSize()!= 1) {
+	    io_actual = cpu_actual;
+	    io_siguiente = io_actual->getBurst();
+	  } else {
+	    asignarCpuACpu(cpu_actual);
+	  }
 	}
       }
       if (!cola_ready->Vacio()) {
@@ -146,8 +167,6 @@ public:
       }
 
       // Se calcula la diferencia que queda para que IO termine
-   
-
       cpu_siguiente = cpu_actual->getBurst();
 
       actualizarTotal(minimo);           
@@ -180,6 +199,14 @@ public:
     }
 
   }
+  
+  void asignarCpuACpu(Proceso *cpu_actual) {
+    if (cola_ready->Vacio()) {
+      cola_ready->Agregar(cpu_actual);
+    } else {
+      cpu_actual = cpu_actual;
+    }
+  }
 
   void actualizarTotal(int dif) {
     cpu_total = cpu_total + dif;
@@ -204,7 +231,6 @@ public:
     cout<<"ciclo: "<<io_actual->getCicloActual()<<"\n";
     }
 
-
   }
 
 };
@@ -213,9 +239,12 @@ int main() {
     std::vector<int> first;
     first.push_back(10);
     first.push_back(200);
+
+    std::vector<int> second;
+    second.push_back(400);
     Proceso p1 = Proceso(1, 1, 1, first);
 
-    Proceso p2 = Proceso(2, 1, 1, first);
+    Proceso p2 = Proceso(2, 3, 1, second);
 
     Proceso* ref = &p1;
     Proceso* ref2 = &p2;
@@ -224,10 +253,18 @@ int main() {
     Sistema s = Sistema(1);
     (s.ready())->Agregar(ref);
     (s.ready())->Agregar(ref2);
-    s.Simular();
+
 
     // Prioridad
     Sistema prioridad = Sistema(2);
     (prioridad.ready())->Agregar(ref2);
     (prioridad.ready())->Agregar(ref);    
+    prioridad.Simular();
+  
+    // Shortest-job-first
+    Sistema sjf = Sistema(3);
+    (sjf.ready())->Agregar(ref2);
+    (sjf.ready())->Agregar(ref);    
+
+
 }

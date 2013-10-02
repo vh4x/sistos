@@ -62,6 +62,10 @@ public:
     else return 0;
   }
 
+  int getSize() {
+    return bursts.size();
+  }
+
   bool ciclosTerminados() {
     if (pid == -1) return true;
     return ciclo_actual >= ciclo;
@@ -74,6 +78,11 @@ public:
   int getBurst() {
     if (pid == -1) return std::numeric_limits<int>::max();
     incIndice();
+    int b = bursts[getIndiceActual()];
+    return b;
+  }
+  
+  int peekBurst() {
     int b = bursts[getIndiceActual()];
     return b;
   }
