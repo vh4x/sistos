@@ -109,20 +109,27 @@ public:
     return b;
   }
 
+  void decIndice() {
+    indice_actual++;
+    if ((indice_actual % bursts.size()) == 0) {
+      bursts = bursts_modelo;
+      ciclo_actual++;
+    }
+  }
+
   int getBurst(int quantum_cpu, int quantum_io) {
     if (pid == -1) return std::numeric_limits<int>::max();
     // Round robin
-    incIndice();
-    int b = bursts[getIndiceActual()];;
-
-      if (quantum_cpu < b) {
-	bursts[getIndiceActual()] = b - quantum_cpu;
-	indice_actual--;
-	return quantum_cpu;
-      } else {
-	incIndice();
-	return b;
-      }
+    indice_actual++;
+    int b = bursts[getIndiceActual()];
+    if (quantum_cpu < b) {
+      bursts[getIndiceActual()] = b - quantum_cpu;
+      indice_actual--;
+      return quantum_cpu;
+    } else {
+      incIndice();
+      return b;
+    }
   }
 
   int peekBurst() {

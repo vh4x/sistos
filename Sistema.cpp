@@ -111,7 +111,6 @@ public:
       } else {
 	ProcesarSiguiente();
       }
-
     }
   }
 
@@ -145,7 +144,6 @@ public:
 	} else {
 	  cola_waiting->Agregar(sig_cpu);
 	}
-	
       }
 
       if (!cola_ready->Vacio()){
@@ -369,17 +367,17 @@ public:
     if (!cola_ready->Vacio())cout<<"cola_ready"<<cola_ready->front()<<"\n";
     if (!cola_waiting->Vacio())cout<<"cola_waiting"<<cola_waiting->front()<<"\n";
     if (cpu_actual != null) {
-    cout<<"CPU actual"<<": ";
-    cout<<"Pid: "<<cpu_actual->getPid() <<" ,";
-    cout<<"indice: "<<cpu_actual->getIndiceActual() <<" ,";
-    cout<<"ciclo: "<<cpu_actual->getCicloActual()<<"\n";
+      cout<<"CPU actual"<<": ";
+      cout<<"Pid: "<<cpu_actual->getPid() <<" ,";
+      cout<<"indice: "<<cpu_actual->getIndiceActual() <<" ,";
+      cout<<"ciclo: "<<cpu_actual->getCicloActual()<<"\n";
     }
     
     if (io_actual != null) {
-    cout<<"IO actual"<<": ";
-    cout<<"Pid: "<<io_actual->getPid() <<" ,";
-    cout<<"indice: "<<io_actual->getIndiceActual() <<" ,";
-    cout<<"ciclo: "<<io_actual->getCicloActual()<<"\n";
+      cout<<"IO actual"<<": ";
+      cout<<"Pid: "<<io_actual->getPid() <<" ,";
+      cout<<"indice: "<<io_actual->getIndiceActual() <<" ,";
+      cout<<"ciclo: "<<io_actual->getCicloActual()<<"\n";
     }
   }
 };
@@ -391,7 +389,7 @@ int main() {
     first.push_back(200);
 
     std::vector<int> second;
-    second.push_back(400);
+    second.push_back(5);
     Proceso p1 = Proceso(1, 1, 2, first);
 
     Proceso p2 = Proceso(2, 3, 1, second);
@@ -404,7 +402,7 @@ int main() {
     (s.ready())->Agregar(ref);
     (s.ready())->Agregar(ref2);
     
-    */
+    //
     // Prioridad
     Sistema prioridad = Sistema(2);
     (prioridad.ready())->Agregar(ref2);
@@ -415,7 +413,7 @@ int main() {
     Sistema sjf = Sistema(3);
     (sjf.ready())->Agregar(ref2);
     (sjf.ready())->Agregar(ref);    
-
+    */
     // Round robin
     Sistema rr = Sistema(4);
     (rr.ready())->Agregar(ref2);
