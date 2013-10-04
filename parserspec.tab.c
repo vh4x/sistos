@@ -68,29 +68,32 @@
 /* Line 268 of yacc.c  */
 #line 1 "parserspec.y"
 
+#pragma once
 #include <cstdio>
 #include <iostream>
 #include "Proceso.cpp"
+#include "Sistema.cpp"
 
-using namespace std;
+  using namespace std;
 
-// Definiciones de flex que Bison necesita
-extern "C" int yylex();
-extern "C" int yyparse();
-extern "C" FILE *yyin;
+  // Definiciones de flex que Bison necesita
+  extern "C" int yylex();
+  extern "C" int yyparse();
+  extern "C" FILE *yyin;
  
   int pid;
   int prioridad;
   int ciclo;
-  std::list<int> first;
+  std::vector<int> first;
+  Sistema sistema;
 
   int algoritmo = 0;
 
-void yyerror(const char *s);
+  void yyerror(const char *s);
 
 
 /* Line 268 of yacc.c  */
-#line 94 "parserspec.tab.c"
+#line 97 "parserspec.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -133,14 +136,14 @@ typedef union YYSTYPE
 {
 
 /* Line 293 of yacc.c  */
-#line 24 "parserspec.y"
+#line 27 "parserspec.y"
 
-	int ival;
+  int ival;
 
 
 
 /* Line 293 of yacc.c  */
-#line 144 "parserspec.tab.c"
+#line 147 "parserspec.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -152,7 +155,7 @@ typedef union YYSTYPE
 
 
 /* Line 343 of yacc.c  */
-#line 156 "parserspec.tab.c"
+#line 159 "parserspec.tab.c"
 
 #ifdef short
 # undef short
@@ -443,8 +446,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    41,    41,    42,    49,    46,    57,    61,    65,    69,
-      70,    74,    75,    79,    83
+       0,    44,    44,    45,    52,    49,    59,    63,    67,    71,
+      72,    76,    77,    81,    85
 };
 #endif
 
@@ -1381,59 +1384,58 @@ yyreduce:
         case 4:
 
 /* Line 1806 of yacc.c  */
-#line 49 "parserspec.y"
+#line 52 "parserspec.y"
     { first.clear();}
     break;
 
   case 5:
 
 /* Line 1806 of yacc.c  */
-#line 50 "parserspec.y"
+#line 53 "parserspec.y"
     { Proceso p (pid, prioridad, ciclo, first);
-   std::cout << p.getPid();
-   std::cout  << p.getBursts().front();
+  sistema->Agregar(&p);
 }
     break;
 
   case 6:
 
 /* Line 1806 of yacc.c  */
-#line 57 "parserspec.y"
+#line 59 "parserspec.y"
     { pid = (yyvsp[(2) - (2)].ival);}
     break;
 
   case 7:
 
 /* Line 1806 of yacc.c  */
-#line 61 "parserspec.y"
+#line 63 "parserspec.y"
     { prioridad = (yyvsp[(3) - (3)].ival); }
     break;
 
   case 8:
 
 /* Line 1806 of yacc.c  */
-#line 65 "parserspec.y"
+#line 67 "parserspec.y"
     { ciclo = (yyvsp[(3) - (3)].ival); }
     break;
 
   case 13:
 
 /* Line 1806 of yacc.c  */
-#line 79 "parserspec.y"
+#line 81 "parserspec.y"
     { first.push_back((yyvsp[(3) - (3)].ival)); }
     break;
 
   case 14:
 
 /* Line 1806 of yacc.c  */
-#line 83 "parserspec.y"
+#line 85 "parserspec.y"
     { first.push_back((yyvsp[(3) - (3)].ival)); }
     break;
 
 
 
 /* Line 1806 of yacc.c  */
-#line 1437 "parserspec.tab.c"
+#line 1439 "parserspec.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1664,7 +1666,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 86 "parserspec.y"
+#line 88 "parserspec.y"
 
 
 void menu() {

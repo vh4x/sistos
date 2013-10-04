@@ -1,28 +1,31 @@
 %{
+#pragma once
 #include <cstdio>
 #include <iostream>
 #include "Proceso.cpp"
+#include "Sistema.cpp"
 
-using namespace std;
+  using namespace std;
 
-// Definiciones de flex que Bison necesita
-extern "C" int yylex();
-extern "C" int yyparse();
-extern "C" FILE *yyin;
+  // Definiciones de flex que Bison necesita
+  extern "C" int yylex();
+  extern "C" int yyparse();
+  extern "C" FILE *yyin;
  
   int pid;
   int prioridad;
   int ciclo;
   std::vector<int> first;
+  Sistema sistema;
 
   int algoritmo = 0;
 
-void yyerror(const char *s);
+  void yyerror(const char *s);
 %}
 
 // Union para los diferentes valores que puedan tener los tokens
 %union {
-	int ival;
+  int ival;
 }
 
 // Definición de tokens
@@ -48,8 +51,7 @@ prioridad
 ciclo
 { first.clear();}
 bursts  { Proceso p (pid, prioridad, ciclo, first);
-   std::cout << p.getPid();
-   std::cout  << p.getBursts().front();
+  sistema->Agregar(&p);
 }
 ;
 
