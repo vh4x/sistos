@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 #include <list>
 #include <queue>
 #include <chrono>
@@ -11,9 +12,9 @@
 #include "ColaPrioridad.cpp"
 #include "ColaSJF.cpp"
 #include "ICalendarizador.cpp"
-#include "Proceso.cpp"
 
-//using namespace std;
+using namespace std;
+
 
 class Sistema
 {
@@ -24,6 +25,12 @@ private:
   int cpu_siguiente;
   
   int io_siguiente;
+
+  int cpu_acumulado;
+
+  int io_acumulado;
+
+  int ejecutados;
 
   Proceso *cpu_actual;
   
@@ -49,6 +56,8 @@ public:
   Sistema(int algoritmo) {
     cpu_total = 0;
     count = 0;
+    cpu_acumulado = 0;
+    io_acumulado = 0;
     std::vector<int> v;
     null = new Proceso(-1, -1, -1, v);
     quantum_cpu = 0;
@@ -93,6 +102,7 @@ public:
   }
 
   void Simular() {
+    ejecutados = cola_ready->Size();
     cpu_actual = cola_ready->Siguiente();
     io_actual = null;
     if (quantum_cpu == 0) {
@@ -106,15 +116,14 @@ public:
     while (!(cpu_actual==null && io_actual==null)  ) {
       count++;
       if (quantum_cpu != 0) {
-	std::cout<<"\n";
-	std::cout<<"rrproceso\n";
-	ProcesarSiguienteRR();
+        ProcesarSiguienteRR();
       } else {
-	ProcesarSiguiente();
+        ProcesarSiguiente();
       }
       printState();
       cout<<"\n";
     }
+    printResumen();
 
   }
 
@@ -124,8 +133,6 @@ public:
     Proceso *sig_io;
    
     if (cpu_siguiente == minimo && io_siguiente == minimo){
-      cout<<"iguales";
-      cout<<"\n";
       if (cpu_actual == null && io_actual == null) return;
       // Cambiar proceso en ejecución
       sig_io = cpu_actual;
@@ -152,26 +159,25 @@ public:
 
       if (!cola_ready->Vacio()){
 	cpu_actual = cola_ready->Siguiente();
-	cpu_siguiente = cpu_actual->getBurst(quantum_cpu, quantum_io);
+	//cpu_siguiente = cpu_actual->getBurst(quantum_cpu, quantum_io);
       } else {
 	cpu_actual = null;
       }
 
       if (!cola_waiting->Vacio()) {
 	io_actual = cola_waiting->Siguiente();
-	io_siguiente = io_actual->getBurst(quantum_cpu, quantum_io);
+	//io_siguiente = io_actual->getBurst(quantum_cpu, quantum_io);
       } 
       else {
 	io_actual = null;
       }
-     
+      io_siguiente = io_actual->getBurst(quantum_cpu, quantum_io);
+      cpu_siguiente = cpu_actual->getBurst();
       actualizarTotal(minimo);
-      cout<<"finiguales\n";
       return;
     }
     
     if (cpu_siguiente == minimo) {
-      cout<<("mincpu")<<"\n";
       if (!cpu_actual->ciclosTerminados()) {
 	if (!cola_waiting->Vacio() || io_actual != null) {
 	  if (cpu_actual->getSize()!= 1) {
@@ -207,12 +213,10 @@ public:
       cpu_siguiente = cpu_actual->getBurst(quantum_cpu, quantum_io);
 
       actualizarTotal(minimo);           
-      cout<<"finmincpu\n";
       return;
     }
 
     if (io_siguiente == minimo) {
-      std::cout<<("minio");
       std::cout<<"\n";
       if (!io_actual->ciclosTerminados()) {
 	if (!cola_ready->Vacio() || cpu_actual != null) {
@@ -242,19 +246,17 @@ public:
       // Se calcula la diferencia que queda para que CPU termine
       io_siguiente = io_actual->getBurst(quantum_cpu, quantum_io);
       actualizarTotal(minimo);
-      std::cout<<"finminio\n";
       return;
     }
   }
 
   void ProcesarSiguiente() {
+
     int minimo = min(cpu_siguiente, io_siguiente);
     Proceso *sig_cpu;
     Proceso *sig_io;
    
     if (cpu_siguiente == minimo && io_siguiente == minimo){
-      std::cout<<"iguales";
-      std::cout<<"\n";
       if (cpu_actual == null && io_actual == null) return;
       // Cambiar proceso en ejecución
       sig_io = cpu_actual;
@@ -277,26 +279,26 @@ public:
 
       if (!cola_ready->Vacio()){
 	cpu_actual = cola_ready->Siguiente();
-	cpu_siguiente = cpu_actual->getBurst();
+	//cpu_siguiente = cpu_actual->getBurst();
       } else {
 	cpu_actual = null;
       }
 
       if (!cola_waiting->Vacio()) {
 	io_actual = cola_waiting->Siguiente();
-	io_siguiente = io_actual->getBurst();
+	//io_siguiente = io_actual->getBurst();
       } 
       else {
 	io_actual = null;
       }
-     
+
+      io_siguiente = io_actual->getBurst();
+      cpu_siguiente = cpu_actual->getBurst();
       actualizarTotal(minimo);
       return;
     }
     
     if (cpu_siguiente == minimo) {
-      std::cout<<("mincpu");
-      std::cout<<"\n";
       if (!cpu_actual->ciclosTerminados()) {
 	if (!cola_waiting->Vacio() || io_actual != null) {
 	  if (cpu_actual->getSize()!= 1) {
@@ -329,8 +331,6 @@ public:
     }
 
     if (io_siguiente == minimo) {
-      std::cout<<("minio");
-      std::cout<<"\n\n";
       if (!io_actual->ciclosTerminados()) {
 	if (!cola_ready->Vacio() || cpu_actual != null) {
 	  cola_ready->Agregar(io_actual);
@@ -373,69 +373,115 @@ public:
   }
 
   void actualizarTotal(int dif) {
+    if(cpu_actual->ciclosTerminados()) {
+      cpu_actual = null;
+    }
+    if (io_actual->ciclosTerminados()) {
+      io_actual = null;
+    }
+    
     cpu_total = cpu_total + dif;
     return;
   }
 
-  void printState() {
-    std::cout<<"CPU total"<<cpu_total<<"\n";
-    std::cout<<"CPU sig"<<cpu_siguiente<<"\n";
-    std::cout<<"IO sig"<<io_siguiente<<"\n";
-    if (!cola_ready->Vacio())std::cout<<"cola_ready"<<cola_ready->front()<<"\n";
-    if (!cola_waiting->Vacio())std::cout<<"cola_waiting"<<cola_waiting->front()<<"\n";
+  inline void printResumen() {
+
+    cout<<"********************************************\n";
+    cout<<ejecutados<<" procesos ejecutados en un total de tiempo de "<<cpu_total<<"\n";
+    float pcpu = (float)cpu_acumulado / (float) cpu_total;
+    float pio= (float)io_acumulado / (float) cpu_total;
+    cout<<"Utilización CPU: "<<pcpu<<"\n";
+    cout<<"Utilización IO: "<<pio<<"\n";
+    cout<<"Utilización IO: "<<pio<<"\n";
+    cout<<"********************************************\n";
+
+  }
+
+  inline void printState() {
+    ofstream salida;
+    salida.open ("salida.txt", ios::out | ios::app | ios::trunc);
+    cout<<"CPU total"<<cpu_total<<"\n";
+    cout<<"CPU sig"<<cpu_siguiente<<"\n";
+    cout<<"IO sig"<<io_siguiente<<"\n";
+    cout<<"Utilización CPU acumulado: "<<cpu_acumulado<<"\n";
+    cout<<"Utilización IO acumulado: "<<io_acumulado<<"\n";
+    if (!cola_ready->Vacio())cout<<"cola_ready"<<cola_ready->front()<<"\n";
+    if (!cola_waiting->Vacio())cout<<"cola_waiting"<<cola_waiting->front()<<"\n";
     if (cpu_actual != null) {
-      std::cout<<"CPU actual"<<": ";
-      std::cout<<"Pid: "<<cpu_actual->getPid() <<" ,";
-      std::cout<<"indice: "<<cpu_actual->getIndiceActual() <<" ,";
-      std::cout<<"ciclo: "<<cpu_actual->getCicloActual()<<"\n";
+      cpu_acumulado = cpu_acumulado + cpu_siguiente;
+      cout<<"CPU actual"<<": ";
+      cout<<"Pid: "<<cpu_actual->getPid() <<" ,";
+      cout<<"indice: "<<cpu_actual->getIndiceActual() <<" ,";
+      cout<<"ciclo: "<<cpu_actual->getCicloActual()<<"\n";
     }
     
     if (io_actual != null) {
-      std::cout<<"IO actual"<<": ";
-      std::cout<<"Pid: "<<io_actual->getPid() <<" ,";
-      std::cout<<"indice: "<<io_actual->getIndiceActual() <<" ,";
-      std::cout<<"ciclo: "<<io_actual->getCicloActual()<<"\n";
+      io_acumulado = io_acumulado + io_siguiente;
+      cout<<"IO actual"<<": ";
+      cout<<"Pid: "<<io_actual->getPid() <<" ,";
+      cout<<"indice: "<<io_actual->getIndiceActual() <<" ,";
+      cout<<"ciclo: "<<io_actual->getCicloActual()<<"\n";
     }
+
+    salida<<"CPU total"<<cpu_total<<"\n";
+    //salida<<"CPU sig"<<cpu_siguiente<<"\n";
+    //salida<<"IO sig"<<io_siguiente<<"\n";
+    
+    if (cpu_actual != null) {
+      salida<<"CPU actual"<<": ";
+      salida<<"Pid: "<<cpu_actual->getPid() <<" ,";
+      //salida<<"indice: "<<cpu_actual->getIndiceActual() <<" ,";
+      salida<<"ciclo: "<<cpu_actual->getCicloActual()<<"\n";
+    }
+    
+    if (io_actual != null) {
+      salida<<"IO actual"<<": ";
+      salida<<"Pid: "<<io_actual->getPid() <<" ,";
+      //salida<<"indice: "<<io_actual->getIndiceActual() <<" ,";
+      salida<<"ciclo: "<<io_actual->getCicloActual()<<"\n";
+    }
+    salida<<"\n";
+    salida.close();
   }
 };
 
 
-int main() {
-    std::vector<int> first;
-    first.push_back(4);
-    first.push_back(4);
+// int main() {
+//     std::vector<int> first;
+//     first.push_back(4);
+//     first.push_back(4);
 
-    std::vector<int> second;
-    second.push_back(5);
-    Proceso p1 = Proceso(1, 1, 2, first);
+//     std::vector<int> second;
+//     second.push_back(5);
+//     Proceso p1 = Proceso(1, 1, 2, first);
 
-    Proceso p2 = Proceso(2, 3, 1, second);
+//     Proceso p2 = Proceso(2, 3, 1, second);
 
-    Proceso* ref = &p1;
-    Proceso* ref2 = &p2;
-    /*
-    // FCFS
-    Sistema s = Sistema(1);
-    (s.ready())->Agregar(ref);
-    (s.ready())->Agregar(ref2);
+//     Proceso* ref = &p1;
+//     Proceso* ref2 = &p2;
     
-    //
-    // Prioridad
-    Sistema prioridad = Sistema(2);
-    (prioridad.ready())->Agregar(ref2);
-    (prioridad.ready())->Agregar(ref);    
-    prioridad.Simular();
+//     // FCFS
+//     Sistema s = Sistema(1);
+//     (s.ready())->Agregar(ref);
+//     (s.ready())->Agregar(ref2);
+    
+//     //
+//     // Prioridad
+//     Sistema prioridad = Sistema(2);
+//     (prioridad.ready())->Agregar(ref2);
+//     (prioridad.ready())->Agregar(ref);    
+//     prioridad.Simular();
   
-    // Shortest-job-first
-    Sistema sjf = Sistema(3);
-    (sjf.ready())->Agregar(ref2);
-    (sjf.ready())->Agregar(ref);    
-    */
-    // Round robin
-    Sistema rr = Sistema(4);
-    (rr.ready())->Agregar(ref2);
-    (rr.ready())->Agregar(ref);    
-    rr.Simular();
+//     // Shortest-job-first
+//     Sistema sjf = Sistema(3);
+//     (sjf.ready())->Agregar(ref2);
+//     (sjf.ready())->Agregar(ref);    
+    
+//     // Round robin
+//     Sistema rr = Sistema(4);
+//     (rr.ready())->Agregar(ref2);
+//     (rr.ready())->Agregar(ref);    
+//     rr.Simular();
 
-}
+// }
 

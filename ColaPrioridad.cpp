@@ -45,4 +45,8 @@ public:
     return cola.top();
   }
 
+  virtual int Size() {
+    return cola.size();
+  }
+
 };

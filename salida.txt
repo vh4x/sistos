@@ -1,0 +1,126 @@
+CPU total0
+CPU sig2
+IO sig2
+cola_ready0x1cf8490
+CPU actual: Pid: 34 ,indice: 0 ,ciclo: 0
+CPU total2
+CPU sig10
+IO sig7
+CPU actual: Pid: 35 ,indice: 0 ,ciclo: 0
+IO actual: Pid: 34 ,indice: 1 ,ciclo: 0
+CPU total9
+CPU sig3
+IO sig2147483647
+cola_ready0x1cf83d0
+CPU actual: Pid: 35 ,indice: 0 ,ciclo: 0
+CPU total12
+CPU sig2
+IO sig200
+CPU actual: Pid: 34 ,indice: 0 ,ciclo: 1
+IO actual: Pid: 35 ,indice: 1 ,ciclo: 0
+CPU total14
+CPU sig2147483647
+IO sig198
+cola_waiting0x1cf83d0
+IO actual: Pid: 35 ,indice: 1 ,ciclo: 0
+CPU total212
+CPU sig5
+IO sig7
+CPU actual: Pid: 35 ,indice: 2 ,ciclo: 0
+IO actual: Pid: 34 ,indice: 1 ,ciclo: 1
+CPU total217
+CPU sig2147483647
+IO sig2
+cola_waiting0x1cf8490
+IO actual: Pid: 34 ,indice: 1 ,ciclo: 1
+CPU total219
+CPU sig2
+IO sig13
+CPU actual: Pid: 34 ,indice: 0 ,ciclo: 2
+IO actual: Pid: 35 ,indice: 3 ,ciclo: 0
+CPU total221
+CPU sig2147483647
+IO sig13
+IO actual: Pid: 35 ,indice: 3 ,ciclo: 0
+CPU total234
+CPU sig10
+IO sig2147483647
+CPU actual: Pid: 35 ,indice: 0 ,ciclo: 1
+CPU total244
+CPU sig2147483647
+IO sig200
+IO actual: Pid: 35 ,indice: 1 ,ciclo: 1
+CPU total444
+CPU sig5
+IO sig2147483647
+CPU actual: Pid: 35 ,indice: 2 ,ciclo: 1
+CPU total449
+CPU sig2147483647
+IO sig13
+IO actual: Pid: 35 ,indice: 3 ,ciclo: 1
+CPU total462
+CPU sig10
+IO sig2147483647
+CPU actual: Pid: 35 ,indice: 0 ,ciclo: 2
+CPU total472
+CPU sig2147483647
+IO sig2147483647
+CPU total0
+CPU sig200
+IO sig200
+cola_ready0x17313d0
+CPU actual: Pid: 35 ,indice: 1 ,ciclo: 0
+CPU total200
+CPU sig7
+IO sig5
+CPU actual: Pid: 34 ,indice: 1 ,ciclo: 0
+IO actual: Pid: 35 ,indice: 2 ,ciclo: 0
+CPU total205
+CPU sig2
+IO sig2147483647
+cola_ready0x1731490
+CPU actual: Pid: 34 ,indice: 1 ,ciclo: 0
+CPU total207
+CPU sig13
+IO sig2
+CPU actual: Pid: 35 ,indice: 3 ,ciclo: 0
+IO actual: Pid: 34 ,indice: 0 ,ciclo: 1
+CPU total209
+CPU sig11
+IO sig2147483647
+cola_ready0x17313d0
+CPU actual: Pid: 35 ,indice: 3 ,ciclo: 0
+CPU total220
+CPU sig7
+IO sig10
+CPU actual: Pid: 34 ,indice: 1 ,ciclo: 1
+IO actual: Pid: 35 ,indice: 0 ,ciclo: 1
+CPU total227
+CPU sig2147483647
+IO sig3
+cola_waiting0x17313d0
+IO actual: Pid: 35 ,indice: 0 ,ciclo: 1
+CPU total230
+CPU sig200
+IO sig2
+CPU actual: Pid: 35 ,indice: 1 ,ciclo: 1
+IO actual: Pid: 34 ,indice: 0 ,ciclo: 2
+CPU total232
+CPU sig200
+IO sig2147483647
+CPU actual: Pid: 35 ,indice: 1 ,ciclo: 1
+CPU total432
+CPU sig2147483647
+IO sig5
+IO actual: Pid: 35 ,indice: 2 ,ciclo: 1
+CPU total437
+CPU sig13
+IO sig2147483647
+CPU actual: Pid: 35 ,indice: 3 ,ciclo: 1
+CPU total450
+CPU sig2147483647
+IO sig10
+IO actual: Pid: 35 ,indice: 0 ,ciclo: 2
+CPU total460
+CPU sig2147483647
+IO sig2147483647

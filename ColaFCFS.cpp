@@ -35,4 +35,8 @@ public:
   virtual Proceso* front() {
     return cola.front();
   }
+
+  virtual int Size() {
+    return cola.size();
+  }
 };

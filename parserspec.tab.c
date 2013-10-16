@@ -71,10 +71,11 @@
 #pragma once
 #include <cstdio>
 #include <iostream>
-#include "Proceso.cpp"
-#include "Sistema.cpp"
+#include "Sistema.h"
 
-  using namespace std;
+
+
+  //using namespace std;
 
   // Definiciones de flex que Bison necesita
   extern "C" int yylex();
@@ -85,8 +86,7 @@
   int prioridad;
   int ciclo;
   std::vector<int> first;
-  Sistema sistema;
-
+  std::vector<Proceso*> procesos;
   int algoritmo = 0;
 
   void yyerror(const char *s);
@@ -446,8 +446,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    44,    44,    45,    52,    49,    59,    63,    67,    71,
-      72,    76,    77,    81,    85
+       0,    45,    45,    46,    53,    50,    60,    64,    68,    72,
+      73,    77,    78,    82,    86
 };
 #endif
 
@@ -1384,51 +1384,51 @@ yyreduce:
         case 4:
 
 /* Line 1806 of yacc.c  */
-#line 52 "parserspec.y"
+#line 53 "parserspec.y"
     { first.clear();}
     break;
 
   case 5:
 
 /* Line 1806 of yacc.c  */
-#line 53 "parserspec.y"
-    { Proceso p (pid, prioridad, ciclo, first);
-  sistema->Agregar(&p);
+#line 54 "parserspec.y"
+    {   
+  procesos.push_back(new Proceso(pid, prioridad, ciclo, first));
 }
     break;
 
   case 6:
 
 /* Line 1806 of yacc.c  */
-#line 59 "parserspec.y"
+#line 60 "parserspec.y"
     { pid = (yyvsp[(2) - (2)].ival);}
     break;
 
   case 7:
 
 /* Line 1806 of yacc.c  */
-#line 63 "parserspec.y"
+#line 64 "parserspec.y"
     { prioridad = (yyvsp[(3) - (3)].ival); }
     break;
 
   case 8:
 
 /* Line 1806 of yacc.c  */
-#line 67 "parserspec.y"
+#line 68 "parserspec.y"
     { ciclo = (yyvsp[(3) - (3)].ival); }
     break;
 
   case 13:
 
 /* Line 1806 of yacc.c  */
-#line 81 "parserspec.y"
+#line 82 "parserspec.y"
     { first.push_back((yyvsp[(3) - (3)].ival)); }
     break;
 
   case 14:
 
 /* Line 1806 of yacc.c  */
-#line 85 "parserspec.y"
+#line 86 "parserspec.y"
     { first.push_back((yyvsp[(3) - (3)].ival)); }
     break;
 
@@ -1666,7 +1666,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 88 "parserspec.y"
+#line 89 "parserspec.y"
 
 
 void menu() {
@@ -1678,29 +1678,46 @@ void menu() {
     cout << "3. Prioridad\n";
     cout << "4. Round-robin \n";
     cout << "5. Exit \n";
-    cout << "Response : ";
     cin >> algoritmo;
     cout << "\n";
 }
 
 
-main() {
+int main() {
 
+  menu();
+
+  Sistema sistema = Sistema(algoritmo);
   
-	// open a file handle to a particular file:
-	FILE *myfile = fopen("entrada.txt", "r");
-	// make sure it is valid:
-	if (!myfile) {
-		cout << "I can't open a.snazzle.file!" << endl;
-		return -1;
-	}
-	// set flex to read from it instead of defaulting to STDIN:
-	yyin = myfile;
-	
-	// parse through the input until there is no more:
-	do {
-		yyparse();
-	} while (!feof(yyin));
+  if (algoritmo < 5 && algoritmo > 0) {
+      // open a file handle to a particular file:
+    FILE *myfile = fopen("entrada.txt", "r");
+    // make sure it is valid:
+    if (!myfile) {
+      cout << "No se puede abrir el archivo" << endl;
+      return -1;
+    }
+    // set flex to read from it instead of defaulting to STDIN:
+    yyin = myfile;
+    
+    // parse through the input until there is no more:
+    do {
+      yyparse();
+    } while (!feof(yyin));
+
+    for (int i = 0; i < procesos.size(); ++i)
+    {
+      (sistema.ready())->Agregar(procesos.at(i));
+    }
+
+    sistema.Simular();
+
+    
+
+  } else {
+    cout << "kthxbye\n";
+    return 0;
+  }
 	
 }
 
@@ -1709,4 +1726,6 @@ void yyerror(const char *s) {
 	// might as well halt now:
 	exit(-1);
 }
+
+
 

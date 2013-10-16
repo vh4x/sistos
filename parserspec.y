@@ -2,10 +2,11 @@
 #pragma once
 #include <cstdio>
 #include <iostream>
-#include "Proceso.cpp"
-#include "Sistema.cpp"
+#include "Sistema.h"
 
-  using namespace std;
+
+
+  //using namespace std;
 
   // Definiciones de flex que Bison necesita
   extern "C" int yylex();
@@ -16,8 +17,7 @@
   int prioridad;
   int ciclo;
   std::vector<int> first;
-  Sistema sistema;
-
+  std::vector<Proceso*> procesos;
   int algoritmo = 0;
 
   void yyerror(const char *s);
@@ -41,7 +41,8 @@
 // Gramática
 
 archivo:
-        archivo pcb
+
+  archivo pcb
 	| pcb
 	;
 
@@ -50,8 +51,8 @@ id
 prioridad
 ciclo
 { first.clear();}
-bursts  { Proceso p (pid, prioridad, ciclo, first);
-  sistema->Agregar(&p);
+bursts  {   
+  procesos.push_back(new Proceso(pid, prioridad, ciclo, first));
 }
 ;
 
@@ -96,29 +97,46 @@ void menu() {
     cout << "3. Prioridad\n";
     cout << "4. Round-robin \n";
     cout << "5. Exit \n";
-    cout << "Response : ";
     cin >> algoritmo;
     cout << "\n";
 }
 
 
-main() {
+int main() {
 
+  menu();
+
+  Sistema sistema = Sistema(algoritmo);
   
-	// open a file handle to a particular file:
-	FILE *myfile = fopen("entrada.txt", "r");
-	// make sure it is valid:
-	if (!myfile) {
-		cout << "I can't open a.snazzle.file!" << endl;
-		return -1;
-	}
-	// set flex to read from it instead of defaulting to STDIN:
-	yyin = myfile;
-	
-	// parse through the input until there is no more:
-	do {
-		yyparse();
-	} while (!feof(yyin));
+  if (algoritmo < 5 && algoritmo > 0) {
+      // open a file handle to a particular file:
+    FILE *myfile = fopen("entrada.txt", "r");
+    // make sure it is valid:
+    if (!myfile) {
+      cout << "No se puede abrir el archivo" << endl;
+      return -1;
+    }
+    // set flex to read from it instead of defaulting to STDIN:
+    yyin = myfile;
+    
+    // parse through the input until there is no more:
+    do {
+      yyparse();
+    } while (!feof(yyin));
+
+    for (int i = 0; i < procesos.size(); ++i)
+    {
+      (sistema.ready())->Agregar(procesos.at(i));
+    }
+
+    sistema.Simular();
+
+    
+
+  } else {
+    cout << "kthxbye\n";
+    return 0;
+  }
 	
 }
 
@@ -127,3 +145,5 @@ void yyerror(const char *s) {
 	// might as well halt now:
 	exit(-1);
 }
+
+
